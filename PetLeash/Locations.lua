@@ -17,6 +17,10 @@ local special_locations = {
         name = L["Instance"],
         func = function() return addon.InInstanceOrRaid() end,
     },
+    manastorm = {
+        name = THE_MANASTORM,
+        func = function() return addon.InManastorm() end,
+    },
 }
 
 local LOCATION_TYPES = {customLocations=1, specialLocations=1}
