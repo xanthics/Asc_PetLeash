@@ -819,7 +819,7 @@ function addon:QUEST_FINISHED()
 end
 
 function addon:ACTIVE_MANASTORM_UPDATED(event, old, new)
-    if new ~= "0" then
+    if new ~= 0 then
         in_manastorm = true
     else
         in_manastorm = false
