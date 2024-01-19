@@ -1,6 +1,5 @@
-
 local addon = PetLeash
-local L	= LibStub("AceLocale-3.0"):GetLocale("PetLeash")
+local L = LibStub("AceLocale-3.0"):GetLocale("PetLeash")
 
 local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 
@@ -15,11 +14,19 @@ local special_locations = {
 	},
 	instance = {
 		name = L["Dungeon"],
-		func = function() local _,t = IsInInstance() return t == "party" and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
+		func = function()
+			local _, t = IsInInstance()
+			return t == "party" and
+			not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
+		end,
 	},
 	raid = {
 		name = L["Raid"],
-		func = function() local _,t = IsInInstance() return t == "raid" and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
+		func = function()
+			local _, t = IsInInstance()
+			return t == "raid" and
+			not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
+		end,
 	},
 	manastorm = {
 		name = THE_MANASTORM,
@@ -27,17 +34,17 @@ local special_locations = {
 	},
 }
 
-local LOCATION_TYPES = {customLocations=1, specialLocations=1}
+local LOCATION_TYPES = { customLocations = 1, specialLocations = 1 }
 
 local UpdateCustomLocationConfigTables, UpdateSpecialLocationConfigTables, config_getLocationArgs, buildConfigLocation
 
 function addon:AddCustomLocation(name)
-	if(not name or name == "") then
+	if (not name or name == "") then
 		return
 	end
-	
-	self.db.char.sets.customLocations[name].enable = true      -- touch
-	
+
+	self.db.char.sets.customLocations[name].enable = true -- touch
+
 	UpdateCustomLocationConfigTables(self)
 end
 
@@ -50,9 +57,9 @@ end
 
 function addon:GetLocationPet(ltype, name, spellid)
 	assert(LOCATION_TYPES[ltype])
-	
-	for i,v in ipairs(self.db.char.sets[ltype][name].pets) do
-		if(spellid == v) then
+
+	for i, v in ipairs(self.db.char.sets[ltype][name].pets) do
+		if (spellid == v) then
 			return i
 		end
 	end
@@ -63,12 +70,12 @@ function addon:SetLocationPet(ltype, name, spellid, value)
 
 	local t = self.db.char.sets[ltype][name].pets
 	local iszit = self:GetLocationPet(ltype, name, spellid)
-	if(value and not iszit) then
+	if (value and not iszit) then
 		table.insert(t, spellid)
-	elseif(not value and iszit) then
+	elseif (not value and iszit) then
 		table.remove(t, iszit)
 	end
-	
+
 	self:DoLocationCheck(false)
 end
 
@@ -84,57 +91,57 @@ end
 -- dirty bits for updating custom locations
 
 local function config_location_pettoggle_get(info)
-	return info.handler:GetLocationPet(info[#info-3], info[#info-2], tonumber(info[#info]))
+	return info.handler:GetLocationPet(info[#info - 3], info[#info - 2], tonumber(info[#info]))
 end
 
 local function config_location_pettoggle_set(info, val)
-	info.handler:SetLocationPet(info[#info-3], info[#info-2], tonumber(info[#info]), val)
+	info.handler:SetLocationPet(info[#info - 3], info[#info - 2], tonumber(info[#info]), val)
 end
 
 local function config_location_delete(info)
-	info.handler:DeleteCustomLocation(info[#info-1])
+	info.handler:DeleteCustomLocation(info[#info - 1])
 end
 
-local function config_location_enable_set(info,v)
-	assert(LOCATION_TYPES[info[#info-2]])
-	info.handler.db.char.sets[info[#info-2]][info[#info-1]].enable = v
+local function config_location_enable_set(info, v)
+	assert(LOCATION_TYPES[info[#info - 2]])
+	info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].enable = v
 	info.handler:DoLocationCheck(false)
 end
 
 local function config_location_enable_get(info)
-	assert(LOCATION_TYPES[info[#info-2]])
-	return info.handler.db.char.sets[info[#info-2]][info[#info-1]].enable
+	assert(LOCATION_TYPES[info[#info - 2]])
+	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].enable
 end
 
-local function config_location_immediate_set(info,v)
-	assert(LOCATION_TYPES[info[#info-2]])
-	info.handler.db.char.sets[info[#info-2]][info[#info-1]].immediate=v
+local function config_location_immediate_set(info, v)
+	assert(LOCATION_TYPES[info[#info - 2]])
+	info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate = v
 end
 
 local function config_location_immediate_get(info)
-	assert(LOCATION_TYPES[info[#info-2]])
-	return info.handler.db.char.sets[info[#info-2]][info[#info-1]].immediate
+	assert(LOCATION_TYPES[info[#info - 2]])
+	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate
 end
 
 local function config_location_inherit_set(info, v)
-	assert(LOCATION_TYPES[info[#info-2]])
-	local loc = info.handler.db.char.sets[info[#info-2]][info[#info-1]]
-	if(not v) then
+	assert(LOCATION_TYPES[info[#info - 2]])
+	local loc = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]]
+	if (not v) then
 		loc.inherit = false
 		info.handler:UpdateLocationConfigTables()
-	elseif(v and not loc.inherit) then
+	elseif (v and not loc.inherit) then
 		-- only set if we're not going to clobber it
 		-- and not ourselves
 		loc.inherit = true
 		info.handler:UpdateLocationConfigTables()
 	end
-	
+
 	info.handler:DoLocationCheck(false)
 end
 
 local function config_location_inherit_get(info)
-	assert(LOCATION_TYPES[info[#info-2]])
-	return info.handler.db.char.sets[info[#info-2]][info[#info-1]].inherit
+	assert(LOCATION_TYPES[info[#info - 2]])
+	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
 end
 
 local loc_pet_config = {
@@ -150,16 +157,16 @@ local loc_inherit_config = {
 	order = 11,
 	values = {},
 	get = function(info)
-		assert(LOCATION_TYPES[info[#info-2]])
-		
-		local inherit = info.handler.db.char.sets[info[#info-2]][info[#info-1]].inherit
-		if(inherit ~= true) then
+		assert(LOCATION_TYPES[info[#info - 2]])
+
+		local inherit = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
+		if (inherit ~= true) then
 			return inherit
 		end
 	end,
 	set = function(info, val)
-		assert(LOCATION_TYPES[info[#info-2]])
-		info.handler.db.char.sets[info[#info-2]][info[#info-1]].inherit = val
+		assert(LOCATION_TYPES[info[#info - 2]])
+		info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit = val
 		info.handler:DoLocationCheck(false)
 	end
 }
@@ -167,8 +174,8 @@ local loc_inherit_config = {
 function UpdateCustomLocationConfigTables(self, nosignal)
 	local pet_args = loc_pet_config.args
 	wipe(pet_args)
-	
-	for i = 1,GetNumCompanions("CRITTER") do
+
+	for i = 1, GetNumCompanions("CRITTER") do
 		local _, name, spellid = GetCompanionInfo("CRITTER", i)
 
 		pet_args[tostring(spellid)] = {
@@ -178,51 +185,51 @@ function UpdateCustomLocationConfigTables(self, nosignal)
 			set = config_location_pettoggle_set
 		}
 	end
-	
+
 	local loc_args = self.options.args.locations.args.customLocations.plugins.data
-	wipe(loc_args)          -- TODO: check to see if locations is dirty before wiping
+	wipe(loc_args) -- TODO: check to see if locations is dirty before wiping
 	wipe(loc_inherit_config.values)
-	
-	for name,data in pairs(self.db.char.sets.customLocations) do
-		if(data.enable) then
-			if(not loc_inherit_config.values[name]) then
+
+	for name, data in pairs(self.db.char.sets.customLocations) do
+		if (data.enable) then
+			if (not loc_inherit_config.values[name]) then
 				loc_inherit_config.values[name] = name
 			end
-		
+
 			buildConfigLocation(loc_args,
-								name,
-								name,
-								self.db.char.sets.customLocations[name].inherit,
-								"customLocations")
+				name,
+				name,
+				self.db.char.sets.customLocations[name].inherit,
+				"customLocations")
 		end
 	end
-	
-	if(not nosignal) then
+
+	if (not nosignal) then
 		AceConfigRegistry:NotifyChange("PetLeash")
 	end
 end
 
 function UpdateSpecialLocationConfigTables(self, nosignal)
-	for key,data in pairs(special_locations) do
+	for key, data in pairs(special_locations) do
 		buildConfigLocation(
-				self.options.args.locations.args.specialLocations.plugins.data,
-				key,
-				data.name,
-				self.db.char.sets.specialLocations[key].inherit,
-				"specialLocations")
+			self.options.args.locations.args.specialLocations.plugins.data,
+			key,
+			data.name,
+			self.db.char.sets.specialLocations[key].inherit,
+			"specialLocations")
 	end
-	
-	if(not nosignal) then
+
+	if (not nosignal) then
 		AceConfigRegistry:NotifyChange("PetLeash")
 	end
 end
 
 function buildConfigLocation(args, key, name, inherit, ctype)
-	if(not args[key]) then
+	if (not args[key]) then
 		args[key] = config_getLocationArgs(name, ctype)
 	end
-	
-	if(inherit) then
+
+	if (inherit) then
 		args[key].args.pets = nil
 		args[key].args.inherits = loc_inherit_config
 	else
@@ -234,14 +241,14 @@ end
 function config_getLocationArgs(name, ctype)
 	local deleteMe, enableMe
 
-	if(ctype == "customLocations") then
+	if (ctype == "customLocations") then
 		deleteMe = {
 			type = "execute",
 			name = DELETE,
 			order = 1,
 			func = config_location_delete
 		}
-	elseif(ctype == "specialLocations") then
+	elseif (ctype == "specialLocations") then
 		deleteMe = {
 			type = "toggle",
 			name = ENABLE,
@@ -287,14 +294,14 @@ end
 --
 
 function addon:TryInitLocation()
-	if(GetZoneText() == "" or GetZoneText() == nil) then
+	if (GetZoneText() == "" or GetZoneText() == nil) then
 		return
 	end
-	
-	self:HasPet(true)           -- not yet called?
+
+	self:HasPet(true) -- not yet called?
 	self:UpdateLocationConfigTables()
 	self:DoLocationCheck(false)
-	
+
 	self.TryInitLocation = function() end
 end
 
@@ -303,36 +310,36 @@ local checkZone
 function addon:DoLocationCheck(allow_immediate)
 	local cur_zone = GetZoneText()
 	local cur_subzone = GetSubZoneText()
-	
+
 	local cur_pet = self:HasPet()
-	if(cur_pet) then
+	if (cur_pet) then
 		-- convert to spell id
 		cur_pet = select(3, GetCompanionInfo("CRITTER", cur_pet))
 	end
 
 	-- custom zone checks
-	if(checkZone(self, "customLocations", cur_subzone, cur_pet, allow_immediate)) then
+	if (checkZone(self, "customLocations", cur_subzone, cur_pet, allow_immediate)) then
 		return
 	end
-	if(checkZone(self, "customLocations", cur_zone, cur_pet, allow_immediate)) then
+	if (checkZone(self, "customLocations", cur_zone, cur_pet, allow_immediate)) then
 		return
 	end
 
 	-- special zone checks
-	for key,data in pairs(special_locations) do
-		if(data.func()) then
-			if(checkZone(self, "specialLocations", key, cur_pet, allow_immediate)) then
+	for key, data in pairs(special_locations) do
+		if (data.func()) then
+			if (checkZone(self, "specialLocations", key, cur_pet, allow_immediate)) then
 				return
 			end
 		end
 	end
-   
+
 	-- nothing doing
 	self.override_pets = {}
 end
 
 function checkZone(self, ltype, zonename, curpet, allow_immediate)
-	if(not zonename or zonename == "") then
+	if (not zonename or zonename == "") then
 		return
 	end
 
@@ -340,35 +347,35 @@ function checkZone(self, ltype, zonename, curpet, allow_immediate)
 	local locdata = rawget(self.db.char.sets[ltype], zonename)
 
 	-- make sure entry exists
-	if(not locdata or not locdata.enable) then
+	if (not locdata or not locdata.enable) then
 		return
 	end
-	
+
 	local pets = locdata.pets
-	if(locdata.inherit and locdata.inherit ~= true
-				and self.db.char.sets.customLocations[locdata.inherit]) then
+	if (locdata.inherit and locdata.inherit ~= true
+			and self.db.char.sets.customLocations[locdata.inherit]) then
 		pets = self.db.char.sets.customLocations[locdata.inherit].pets
 	end
-	
-	if(locdata and #pets > 0) then
+
+	if (locdata and #pets > 0) then
 		self.override_pets = pets
-	
-		if(allow_immediate and locdata.immediate) then
+
+		if (allow_immediate and locdata.immediate) then
 			local i
-			for id,petid in pairs(pets) do
-				if(petid == curpet) then
+			for id, petid in pairs(pets) do
+				if (petid == curpet) then
 					i = id
 					break
 				end
 			end
-			
-			if(not i) then
+
+			if (not i) then
 				-- mark for resummon immediately!
-				self.ready_to_autoswitch = true     -- we're abusive.
+				self.ready_to_autoswitch = true -- we're abusive.
 				self:StartPetTimer()
 			end
 		end
-		
+
 		return true
 	end
 end

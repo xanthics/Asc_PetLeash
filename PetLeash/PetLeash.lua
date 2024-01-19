@@ -1,8 +1,7 @@
-
 local addon = LibStub("AceAddon-3.0"):NewAddon("PetLeash", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 _G.PetLeash = addon
 
-local L	= LibStub("AceLocale-3.0"):GetLocale("PetLeash")
+local L = LibStub("AceLocale-3.0"):GetLocale("PetLeash")
 
 -- Binding globals
 BINDING_HEADER_PETLEASH = "PetLeash"
@@ -30,15 +29,15 @@ local defaults = {
 		weightedPets = false
 	},
 	char = {
-		ignore_pets = {         -- [spellid] = true, hide.  if false, don't hide
-			[25162] = true,     -- Disgusing Oozling (Combat Effect)
-			[92398] = true,     -- Guild Page, Horde (Long cooldown)
-			[92396] = true,     -- Guild Herald, Horde (Long cooldown)
-			[92395] = true,     -- Guild Page, Alliance (Long cooldown)
-			[92397] = true,     -- Guild Herald, Alliance (Long cooldown)
+		ignore_pets = { -- [spellid] = true, hide.  if false, don't hide
+			[25162] = true, -- Disgusing Oozling (Combat Effect)
+			[92398] = true, -- Guild Page, Horde (Long cooldown)
+			[92396] = true, -- Guild Herald, Horde (Long cooldown)
+			[92395] = true, -- Guild Page, Alliance (Long cooldown)
+			[92397] = true, -- Guild Herald, Alliance (Long cooldown)
 		},
-		weights = {},           -- [spellid] = num (if nil default is 1)
-		
+		weights = {}, -- [spellid] = num (if nil default is 1)
+
 		sets = {
 			-- locations
 			customLocations = {
@@ -47,7 +46,7 @@ local defaults = {
 					enable = false,
 					immediate = true,
 					inherit = false,
-					pets = {}           -- {spellid, spellid, ...}
+					pets = {} -- {spellid, spellid, ...}
 				}
 			},
 			specialLocations = {
@@ -56,7 +55,7 @@ local defaults = {
 					enable = false,
 					immediate = true,
 					inherit = false,
-					pets = {}           -- {spellid, spellid, ...}
+					pets = {} -- {spellid, spellid, ...}
 				}
 			}
 		}
@@ -66,7 +65,7 @@ local defaults = {
 -- config
 
 local function config_toggle_get(info) return addon.db.profile[info[#info]] end
-local function config_toggle_set(info,v) addon.db.profile[info[#info]] = v end
+local function config_toggle_set(info, v) addon.db.profile[info[#info]] = v end
 
 local config_autoSwitchTimer_oldval = 30
 
@@ -88,11 +87,11 @@ local options = {
 						enable = {
 							type = "toggle",
 							name = ENABLE,
-							desc = L["Enable Auto-Summon"], 
+							desc = L["Enable Auto-Summon"],
 							order = 10,
 							width = "full",
 							get = function(info) return addon:IsEnabledSummoning() end,
-							set = function(info,v) addon:EnableSummoning(v) end,
+							set = function(info, v) addon:EnableSummoning(v) end,
 						},
 						enableInCombat = {
 							type = "toggle",
@@ -146,9 +145,9 @@ local options = {
 							get = function()
 								return addon.db.profile.waitTimer
 							end,
-							set = function(info,v)
+							set = function(info, v)
 								addon.db.profile.waitTimer = v
-							end  
+							end
 						},
 					},
 				},
@@ -160,7 +159,8 @@ local options = {
 						disableForQuestItems = {
 							type = "toggle",
 							name = L["Disable For Special Items"],
-							desc = L["Disable when special items that summon pets are detected.  This includes quest items and hats."],
+							desc = L
+							["Disable when special items that summon pets are detected.  This includes quest items and hats."],
 							order = 20,
 							width = "double",
 							get = config_toggle_get,
@@ -176,18 +176,18 @@ local options = {
 							end,
 							values = function()
 								local r = {}
-					
-								for item,func in pairs(addon.quest_items) do
+
+								for item, func in pairs(addon.quest_items) do
 									r[item] = addon:GetQuestItemName(item)
 								end
-					
+
 								return r
 							end,
 							get = function(info, key)
 								return not addon.db.profile.selectedQuestItems[key]
 							end,
 							set = function(info, key, value)
-								addon.db.profile.selectedQuestItems[key] = not value 
+								addon.db.profile.selectedQuestItems[key] = not value
 							end,
 						},
 					}
@@ -203,9 +203,9 @@ local options = {
 							width = "double",
 							order = 31,
 							get = function() return addon.db.profile.autoSwitchTimer end,
-							set = function(info,v)
-								if(v) then
-									if(not addon.db.profile.autoSwitchTimer) then
+							set = function(info, v)
+								if (v) then
+									if (not addon.db.profile.autoSwitchTimer) then
 										addon.db.profile.autoSwitchTimer = config_autoSwitchTimer_oldval
 									end
 								else
@@ -227,7 +227,7 @@ local options = {
 							get = function()
 								return addon.db.profile.autoSwitchTimer or config_autoSwitchTimer_oldval
 							end,
-							set = function(info,v)
+							set = function(info, v)
 								addon.db.profile.autoSwitchTimer = v
 								addon:StartAutoSwitchTimer()
 							end
@@ -324,11 +324,11 @@ local options = {
 					name = L["Custom Locations"],
 					order = 2,
 					args = {
-					   addCurrentZone = {
+						addCurrentZone = {
 							type = "execute",
 							name = L["Add Current Zone"],
 							order = 1,
-							func = function(info) 
+							func = function(info)
 								addon:AddCustomLocation(GetZoneText())
 							end,
 						},
@@ -336,13 +336,13 @@ local options = {
 							type = "execute",
 							name = L["Add Current Subzone"],
 							order = 1,
-							func = function(info) 
+							func = function(info)
 								addon:AddCustomLocation(GetSubZoneText())
 							end,
 						},
 						--addNamedZone = {
-						-- 
-						--}   
+						--
+						--}
 					},
 					plugins = { data = {} }
 				},
@@ -401,21 +401,21 @@ function addon:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChange")
 
-	self.usable_pets = {}   -- spellid, spellid
+	self.usable_pets = {} -- spellid, spellid
 	self.override_pets = {} -- spellid, spellid -- OVERRIDE FOR USABLE_PETS
-	self.pet_map = {}       -- spellid -> {id,name} (complete)
+	self.pet_map = {}    -- spellid -> {id,name} (complete)
 	self.player_invisible = false
-	
+
 	self.options = options
 	self.options_slashcmd = options_slashcmd
-	
+
 	AceConfig:RegisterOptionsTable(self.name, options)
 	self.optionsFrame = AceConfigDialog:AddToBlizOptions(self.name, self.name, nil, "main")
 	self.optionsFrame.Pets = AceConfigDialog:AddToBlizOptions(self.name, L["Enabled Pets"], self.name, "pets")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Locations"], self.name, "locations")
 	self.optionsFrame.About = LibStub("LibAboutPanel").new(self.name, self.name)
-	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, {"petleash", "pl"})
-   
+	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "petleash", "pl" })
+
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("COMPANION_UPDATE")
 	self:RegisterEvent("COMPANION_LEARNED")
@@ -429,19 +429,19 @@ function addon:OnInitialize()
 	self:RegisterEvent("BARBER_SHOP_OPEN")
 	self:RegisterEvent("QUEST_ACCEPTED")
 	self:RegisterEvent("QUEST_FINISHED")
---    self:RegisterEvent("ACTIVE_MANASTORM_UPDATED")
+	--    self:RegisterEvent("ACTIVE_MANASTORM_UPDATED")
 
-	self:LoadPets()                         -- attempt to load pets (might fail)
-	self:ScheduleTimer("LoadPets", 45)      -- sometimes COMPANION_* fails 
-	
+	self:LoadPets()                 -- attempt to load pets (might fail)
+	self:ScheduleTimer("LoadPets", 45) -- sometimes COMPANION_* fails
+
 	self:ScheduleRepeatingTimer("FlightCheck", 1.0)
-	
+
 	-- specifically clicking dismiss will disable us
 	-- TODO: perhaps clicking summon when we've been disabled in this
 	-- way should reenable us?
 	if SpellBookCompanionSummonButton then
 		SpellBookCompanionSummonButton:HookScript("OnClick", function(btn, ...)
-			if(btn:GetText()==PET_DISMISS) then
+			if (btn:GetText() == PET_DISMISS) then
 				self:EnableSummoning(false)
 			end
 		end)
@@ -464,14 +464,14 @@ end
 function addon:EnableSummoning(v)
 	local oldv = self.db.profile.enable
 
-	if((not oldv) ~= (not v)) then
+	if ((not oldv) ~= (not v)) then
 		self.db.profile.enable = v
-		
+
 		-- TODO: is there a better way to trigger config update?
 		AceConfigRegistry:NotifyChange("PetLeash")
 	end
-	
-	if(self.broker) then
+
+	if (self.broker) then
 		local notR = v and 1 or 0.3
 		self.broker.iconG = notR
 		self.broker.iconB = notR
@@ -485,9 +485,9 @@ end
 -- utility functions
 
 local function HasCompanion(pettype)
-	for id = 1,GetNumCompanions(pettype) do
-		local _,_,_,_,issum = GetCompanionInfo(pettype, id)
-		if(issum) then
+	for id = 1, GetNumCompanions(pettype) do
+		local _, _, _, _, issum = GetCompanionInfo(pettype, id)
+		if (issum) then
 			return id
 		end
 	end
@@ -500,16 +500,16 @@ local function IsMounted()
 end
 
 local function IsPetted(id)
-	if(id) then
-		local _,_,_,_,issum = GetCompanionInfo("CRITTER", id)
-		if(issum) then
+	if (id) then
+		local _, _, _, _, issum = GetCompanionInfo("CRITTER", id)
+		if (issum) then
 			return id
 		end
 	else
 		return HasCompanion("CRITTER")
 	end
 end
-addon.IsPetted = IsPetted           -- expose (mostly for debugging)
+addon.IsPetted = IsPetted -- expose (mostly for debugging)
 
 local function IsCasting()
 	return (UnitCastingInfo("player") or UnitChannelInfo("player"))
@@ -518,17 +518,17 @@ end
 local function IsDrinkingOrEating()
 	local drink_name = GetSpellInfo(430)
 	local eat_name = GetSpellInfo(433)
-	
-	if(UnitAura("player", drink_name, nil, "HELPFUL")) then
+
+	if (UnitAura("player", drink_name, nil, "HELPFUL")) then
 		return true
-	elseif(UnitAura("player", eat_name, nil, "HELPFUL")) then
+	elseif (UnitAura("player", eat_name, nil, "HELPFUL")) then
 		return true
 	end
 end
 
-local BATTLEGROUND_ARENA = {["pvp"] = 1, ["arena"] = 1}
+local BATTLEGROUND_ARENA = { ["pvp"] = 1, ["arena"] = 1 }
 local function InBattlegroundOrArena()
-	local _,t = IsInInstance()
+	local _, t = IsInInstance()
 	return BATTLEGROUND_ARENA[t]
 end
 addon.InBattlegroundOrArena = InBattlegroundOrArena
@@ -536,17 +536,17 @@ addon.InBattlegroundOrArena = InBattlegroundOrArena
 -- Blizz function is broken, so we reimplement
 local function UnitIsFeignDeath(unit)
 	local fd_name = GetSpellInfo(5384)
-	if(UnitAura(unit, fd_name, nil, "HELPFUL")) then
+	if (UnitAura(unit, fd_name, nil, "HELPFUL")) then
 		return true
 	end
 end
 
-local InCombat = InCombatLockdown       -- shorthand
+local InCombat = InCombatLockdown -- shorthand
 
 local function CanSummonPet()
 	return
-		-- are we busy?
-			not IsCasting()
+	-- are we busy?
+		not IsCasting()
 		and not IsMounted()
 		and not UnitInVehicle("player")
 		and not UnitIsGhost("player")
@@ -566,39 +566,39 @@ local function CanSummonPet()
 		-- gcd check
 		and (not GetCompanionCooldown or GetCompanionCooldown("CRITTER", 1) == 0)
 end
-addon.CanSummonPet = CanSummonPet       -- expose (mostly for debugging)
+addon.CanSummonPet = CanSummonPet -- expose (mostly for debugging)
 
 -- pet list handling
 
 function addon:LoadPets(updateconfig)
 	wipe(self.usable_pets)
-	
-	for i = 1,GetNumCompanions("CRITTER") do
+
+	for i = 1, GetNumCompanions("CRITTER") do
 		local _, name, spellid = GetCompanionInfo("CRITTER", i)
-		
-		if(not name) then
-			return      -- pets not loaded yet?
+
+		if (not name) then
+			return -- pets not loaded yet?
 		end
-		
-		if(not self.db.char.ignore_pets[spellid]) then
+
+		if (not self.db.char.ignore_pets[spellid]) then
 			table.insert(self.usable_pets, spellid)
 		end
 
-		if(not self.pet_map[spellid]) then
+		if (not self.pet_map[spellid]) then
 			self.pet_map[spellid] = {}
 		end
 		self.pet_map[spellid].id = i
-		self.pet_map[spellid].name = name 
+		self.pet_map[spellid].name = name
 	end
-	
-	if(updateconfig == nil or updateconfig) then
+
+	if (updateconfig == nil or updateconfig) then
 		self:UpdateConfigTables(true)
 	end
-	
+
 	-- does nothing if we've called it successfully before
-	self:TryInitLocation()   
-	self:UpdateQuestList()    
-	
+	self:TryInitLocation()
+	self:UpdateQuestList()
+
 	-- update timer
 	self:UpdatePetTimer()
 end
@@ -607,22 +607,22 @@ function addon:OnProfileChange()
 	self:LoadPets()
 end
 
-local L_WeightValues = {"|cffff0000"..L["Never"].."|r",
-						"|cffff6600"..L["Hardly Ever"].."|r",
-						"|cffff9900"..L["Rarely"].."|r",
-						"|cffddff00"..L["Occasionally"].."|r",
-						"|cff99ff00"..L["Sometimes"].."|r",
-						"|cff00ff00"..L["Often"].."|r"}
+local L_WeightValues = { "|cffff0000" .. L["Never"] .. "|r",
+	"|cffff6600" .. L["Hardly Ever"] .. "|r",
+	"|cffff9900" .. L["Rarely"] .. "|r",
+	"|cffddff00" .. L["Occasionally"] .. "|r",
+	"|cff99ff00" .. L["Sometimes"] .. "|r",
+	"|cff00ff00" .. L["Often"] .. "|r" }
 function addon:UpdateConfigTables()
 	local args = options.args.pets.args.pets.args
 	local useWeighted = self.db.profile.weightedPets
-	
+
 	wipe(args)
-	
-	for i = 1,GetNumCompanions("CRITTER") do
+
+	for i = 1, GetNumCompanions("CRITTER") do
 		local _, name, spellid = GetCompanionInfo("CRITTER", i)
-		
-		if(not useWeighted) then
+
+		if (not useWeighted) then
 			args[tostring(spellid)] = {
 				type = "toggle",
 				name = name,
@@ -631,7 +631,7 @@ function addon:UpdateConfigTables()
 				set = "Config_PetToggle_Set"
 			}
 		else
-		   args[tostring(spellid)] = {
+			args[tostring(spellid)] = {
 				type = "select",
 				name = name,
 				order = 1,
@@ -641,20 +641,20 @@ function addon:UpdateConfigTables()
 			}
 		end
 	end
-	
+
 	self:UpdateLocationConfigTables()
-	
+
 	-- Config Tables changed!
 	AceConfigRegistry:NotifyChange("PetLeash")
 end
 
 function addon:Config_PetToggle_Set(info, v)
-	if(v) then
+	if (v) then
 		self.db.char.ignore_pets[tonumber(info[#info])] = false
 	else
 		self.db.char.ignore_pets[tonumber(info[#info])] = true
 	end
-	
+
 	self:LoadPets(false)
 end
 
@@ -664,19 +664,19 @@ end
 
 function addon:Config_PetToggle_Weighted_Get(info)
 	local id = tonumber(info[#info])
-	if(not self.db.char.ignore_pets[id]) then
-		return math.floor((self.db.char.weights[id] or 1)*5)+1
+	if (not self.db.char.ignore_pets[id]) then
+		return math.floor((self.db.char.weights[id] or 1) * 5) + 1
 	end
 	return 1
 end
 
 function addon:Config_PetToggle_Weighted_Set(info, v)
 	local id = tonumber(info[#info])
-	if(v == 1) then
+	if (v == 1) then
 		self.db.char.ignore_pets[id] = true
 	else
 		self.db.char.ignore_pets[id] = false
-		self.db.char.weights[id] = (v-1)/5
+		self.db.char.weights[id] = (v - 1) / 5
 	end
 	self:LoadPets(false)
 end
@@ -692,18 +692,18 @@ end
 
 function addon:PLAYER_ENTERING_WORLD()
 	-- reload hijinks: maybe we have a pet out already!
-	if(#self.usable_pets > 0 and IsPetted()) then
+	if (#self.usable_pets > 0 and IsPetted()) then
 		self:StartAutoSwitchTimer()
 	end
-	
+
 	self:TryInitLocation()
 	self:UpdateQuestList()
 end
 
 function addon:COMPANION_UPDATE(event, ctype)
-	if(ctype == nil) then
+	if (ctype == nil) then
 		self:LoadPets()
-	elseif(ctype == "CRITTER") then
+	elseif (ctype == "CRITTER") then
 		-- TODO: pet was shown or hidden
 		self:UpdatePetTimer()
 	end
@@ -722,8 +722,8 @@ function addon:BARBER_SHOP_CLOSE()
 end
 
 function addon:UPDATE_STEALTH()
-	if(IsStealthed()) then
-		if(self.db.profile.dismissWhenStealthed) then
+	if (IsStealthed()) then
+		if (self.db.profile.dismissWhenStealthed) then
 			-- desummon pet, but don't disable completely
 			self:DesummonPet(true)
 		end
@@ -732,32 +732,32 @@ function addon:UPDATE_STEALTH()
 	end
 end
 
-local INVIS_SPELLS = {66, 11392, 3680, 80326}
+local INVIS_SPELLS = { 66, 11392, 3680, 80326 }
 function addon:UNIT_AURA(event, unit)
-	if(unit ~= "player") then
+	if (unit ~= "player") then
 		return
 	end
 
 	-- check for invisibility
 	local invisible = false
-	for i,spellid in ipairs(INVIS_SPELLS) do
+	for i, spellid in ipairs(INVIS_SPELLS) do
 		local invis_name, _, invis_texture = GetSpellInfo(spellid)
 		local c_name, _, c_texture = UnitAura("player", invis_name, nil, "HELPFUL")
-		if(c_name == invis_name and invis_texture == c_texture) then
+		if (c_name == invis_name and invis_texture == c_texture) then
 			invisible = true
 			break
 		end
 	end
-		
-	if(invisible) then
-		if(not self.player_invisible) then
+
+	if (invisible) then
+		if (not self.player_invisible) then
 			self.player_invisible = true
-			if(IsPetted() and self.db.profile.dismissWhenStealthed) then
+			if (IsPetted() and self.db.profile.dismissWhenStealthed) then
 				self:DesummonPet(true)
 			end
 		end
 	else
-		if(self.player_invisible) then
+		if (self.player_invisible) then
 			self.player_invisible = false
 			self:UpdatePetTimer()
 		end
@@ -769,8 +769,8 @@ function addon:OnZoneChanged()
 	if self.currentZone ~= curZone then
 		self.currentZone = curZone
 		if PetLeash.db.profile.autoSwitchOnZone then
-				-- pet will be resummoned shortly
-			if(CanSummonPet()) then
+			-- pet will be resummoned shortly
+			if (CanSummonPet()) then
 				self:DesummonPet(true)
 			end
 		end
@@ -809,11 +809,11 @@ function addon:UpdateQuestList()
 	for i = 1, (GetNumQuestLogEntries() or 0) do
 		local link = GetQuestLink(i)
 		if link ~= nil then
-			local _,_,qid = string.find(link, "|Hquest:(%d+):(%d+)|")
+			local _, _, qid = string.find(link, "|Hquest:(%d+):(%d+)|")
 			if qid ~= nil then
 				self.currentquests[tonumber(qid)] = true
 			end
-	   end
+		end
 	end
 end
 
@@ -823,11 +823,11 @@ end
 
 function addon:UpdatePetTimer()
 	local haspet = self:HasPet(true)
-	if(not haspet) then
+	if (not haspet) then
 		self:StartPetTimer()
 	else
 		-- we have a pet
-		if(not self.ready_to_autoswitch) then
+		if (not self.ready_to_autoswitch) then
 			-- and we are happy with it
 			self:StopPetTimer()
 			self:StartAutoSwitchTimer(true)
@@ -837,10 +837,10 @@ end
 
 local countdown
 function addon:StartPetTimer()
-	countdown = self.db.profile.waitTimer*2     -- set countdown
-	if(self.pet_timer) then
-		countdown = countdown + 1       -- add padding
-		return                          -- leave timer running
+	countdown = self.db.profile.waitTimer * 2 -- set countdown
+	if (self.pet_timer) then
+		countdown = countdown + 1        -- add padding
+		return                           -- leave timer running
 	end
 	self.pet_timer = self:ScheduleRepeatingTimer("PeriodicCheckPet", 0.5)
 end
@@ -852,78 +852,78 @@ end
 
 function addon:PeriodicCheckPet()
 	countdown = countdown - 1
-	if(not self:IsPetSummonReady()) then
+	if (not self:IsPetSummonReady()) then
 		-- reset timer
-		countdown = self.db.profile.waitTimer*2
-	elseif(countdown == 0) then
+		countdown = self.db.profile.waitTimer * 2
+	elseif (countdown == 0) then
 		self:SummonPet()
 		self:StopPetTimer()
-		
+
 		self:ScheduleTimer("UpdatePetTimer", 3) -- verify success
 	end
 end
 
 function addon:IsPetSummonReady()
-	if(not self.db.profile.enable) then
+	if (not self.db.profile.enable) then
 		return
-	elseif(not self.db.profile.enableInCombat and InCombat()) then
+	elseif (not self.db.profile.enableInCombat and InCombat()) then
 		return
-	elseif(self.db.profile.disableForQuestItems and self:HasQuestItem()) then
+	elseif (self.db.profile.disableForQuestItems and self:HasQuestItem()) then
 		return
-	elseif(not self.db.profile.enableInBattleground and InBattlegroundOrArena()) then
+	elseif (not self.db.profile.enableInBattleground and InBattlegroundOrArena()) then
 		return
-	elseif(self.db.profile.disableOutsideCities and not IsResting()) then
+	elseif (self.db.profile.disableOutsideCities and not IsResting()) then
 		return
 	end
 
-	if(CanSummonPet()) then
+	if (CanSummonPet()) then
 		return true
 	end
 end
 
 function addon:HasPet(nocache)
-	if(nocache) then
+	if (nocache) then
 		local pet_id = IsPetted(self.pet_id) or IsPetted()
 		self.pet_id = pet_id
 		return pet_id
-	 end
-	 return self.pet_id
+	end
+	return self.pet_id
 end
 
 function addon:FlightCheck()
-	if(not self.db.profile.dismissWhileFlying or not self:HasPet()) then
+	if (not self.db.profile.dismissWhileFlying or not self:HasPet()) then
 		return
 	end
 
-	if(IsFlying()) then
+	if (IsFlying()) then
 		addon:DesummonPet(true)
 	end
 end
 
 function addon:StartAutoSwitchTimer(dont_restart)
-	if(self.switch_timer_handle) then
-		if(dont_restart) then
+	if (self.switch_timer_handle) then
+		if (dont_restart) then
 			return
 		end
-	
+
 		self:CancelTimer(self.switch_timer_handle)
 		self.switch_timer_handle = nil
 	end
 
 	local timer = self.db.profile.autoSwitchTimer
-	if(timer) then
+	if (timer) then
 		self.switch_timer_handle = self:ScheduleTimer("AutoSwitchTimer", timer)
 	end
 end
 
 function addon:AutoSwitchTimer()
-	self.switch_timer_handle = nil     -- timer is finished!
-	
-	if(self.db.profile.autoSwitchCitiesOnly and not IsResting()) then
+	self.switch_timer_handle = nil -- timer is finished!
+
+	if (self.db.profile.autoSwitchCitiesOnly and not IsResting()) then
 		-- not resting, when we require it  restart timer!
 		return self:StartAutoSwitchTimer()
 	end
-	
+
 	self.ready_to_autoswitch = true
 	self:StartPetTimer()
 end
@@ -935,14 +935,14 @@ local function pick_flat(self, petlist)
 end
 
 local function pick_weighted(self, countdown)
-	countdown = (countdown or 1000)     -- upper bound on tries
-	
+	countdown = (countdown or 1000) -- upper bound on tries
+
 	local random_spellid = self.usable_pets[math.random(#self.usable_pets)]
 	local weight = self.db.char.weights[random_spellid] or 1
 
 	assert(weight > 0)
-	
-	if(math.random() > weight and countdown > 0) then
+
+	if (math.random() > weight and countdown > 0) then
 		-- retry
 		return pick_weighted(self, countdown - 1)
 	end
@@ -951,11 +951,11 @@ local function pick_weighted(self, countdown)
 end
 
 function addon:PickPet()
-	if(self.override_pets and #self.override_pets > 0) then
+	if (self.override_pets and #self.override_pets > 0) then
 		return pick_flat(self, self.override_pets)
 	end
 
-	if(not self.db.weightedPets) then
+	if (not self.db.weightedPets) then
 		return pick_flat(self)
 	else
 		return pick_weighted(self)
@@ -963,9 +963,9 @@ function addon:PickPet()
 end
 
 function addon:SummonPet()
-	if(#self.usable_pets > 0) then
+	if (#self.usable_pets > 0) then
 		CallCompanion("CRITTER", self:PickPet())
-		
+
 		self.ready_to_autoswitch = false
 		self:StartAutoSwitchTimer()
 	end
@@ -973,7 +973,7 @@ end
 
 function addon:DesummonPet(disable)
 	DismissCompanion("CRITTER")
-	if(not disable or disable == nil) then
+	if (not disable or disable == nil) then
 		addon:EnableSummoning(false)
 	end
 end
@@ -986,13 +986,12 @@ function addon:ResummonPet()
 end
 
 function addon:TogglePet()
-	if(IsPetted()) then
+	if (IsPetted()) then
 		self:DesummonPet()
 	else
 		self:EnableSummoning(true)
-		if(CanSummonPet()) then
+		if (CanSummonPet()) then
 			self:SummonPet()
 		end
 	end
 end
-
