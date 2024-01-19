@@ -80,7 +80,7 @@ local function str_range_diff(a, b)
 		char_b = iter_b()
 	end
 
-	return r
+	return r, r
 end
 
 local function safe_GetCritterName(id)
