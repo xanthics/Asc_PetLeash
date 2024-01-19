@@ -533,13 +533,6 @@ local function InBattlegroundOrArena()
 end
 addon.InBattlegroundOrArena = InBattlegroundOrArena
 
-local RAID_INSTANCE = {["party"] = 1, ["raid"] = 1}
-local function InInstanceOrRaid()
-    local _,t = IsInInstance()
-    return RAID_INSTANCE[t]
-end
-addon.InInstanceOrRaid = InInstanceOrRaid
-
 -- Blizz function is broken, so we reimplement
 local function UnitIsFeignDeath(unit)
     local fd_name = GetSpellInfo(5384)

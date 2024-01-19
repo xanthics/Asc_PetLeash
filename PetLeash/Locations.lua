@@ -14,8 +14,12 @@ local special_locations = {
         func = function() return addon.InBattlegroundOrArena() end,
     },
     instance = {
-        name = L["Instance"],
-        func = function() return addon.InInstanceOrRaid() and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
+        name = L["Dungeon"],
+        func = function() local _,t = IsInInstance() return t == "party" and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
+    },
+    raid = {
+        name = L["Raid"],
+        func = function() local _,t = IsInInstance() return t == "raid" and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
     },
     manastorm = {
         name = THE_MANASTORM,
