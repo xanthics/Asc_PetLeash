@@ -11,8 +11,6 @@ BINDING_NAME_PETLEASH_DESUMMON = L["Desummon Pet"]
 BINDING_NAME_PETLEASH_TOGGLE = L["Toggle Non-Combat Pet"]
 BINDING_NAME_PETLEASH_CONFIG = L["Open Configuration"]
 
-local in_manastorm = false
-
 
 -- Default DB
 local defaults = {
@@ -431,7 +429,7 @@ function addon:OnInitialize()
     self:RegisterEvent("BARBER_SHOP_OPEN")
     self:RegisterEvent("QUEST_ACCEPTED")
     self:RegisterEvent("QUEST_FINISHED")
-    self:RegisterEvent("ACTIVE_MANASTORM_UPDATED")
+--    self:RegisterEvent("ACTIVE_MANASTORM_UPDATED")
 
     self:LoadPets()                         -- attempt to load pets (might fail)
     self:ScheduleTimer("LoadPets", 45)      -- sometimes COMPANION_* fails 
@@ -541,11 +539,6 @@ local function InInstanceOrRaid()
     return RAID_INSTANCE[t]
 end
 addon.InInstanceOrRaid = InInstanceOrRaid
-
-local function InManastorm()
-    return in_manastorm
-end
-addon.InManastorm = InManastorm
 
 -- Blizz function is broken, so we reimplement
 local function UnitIsFeignDeath(unit)
@@ -816,14 +809,6 @@ end
 
 function addon:QUEST_FINISHED()
     self:UpdateQuestList()
-end
-
-function addon:ACTIVE_MANASTORM_UPDATED(event, old, new)
-    if new ~= 0 then
-        in_manastorm = true
-    else
-        in_manastorm = false
-    end
 end
 
 function addon:UpdateQuestList()

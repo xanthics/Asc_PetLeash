@@ -15,11 +15,11 @@ local special_locations = {
     },
     instance = {
         name = L["Instance"],
-        func = function() return addon.InInstanceOrRaid() and not (addon.db.char.sets.specialLocations["manastorm"].enable and addon.InManastorm()) end,
+        func = function() return addon.InInstanceOrRaid() and not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm()) end,
     },
     manastorm = {
         name = THE_MANASTORM,
-        func = function() return addon.InManastorm() end,
+        func = function() return C_Manastorm.IsInManastorm() end,
     },
 }
 
