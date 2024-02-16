@@ -1,4 +1,4 @@
-This is a Project Ascension specific port of PetLeash v1.6.6 and probably won't work in other environments
+This is a Project Ascension specific port of PetLeash v1.6.6 and probably won't work in other environments.
 
 Code -> download zip -> Extract
 
