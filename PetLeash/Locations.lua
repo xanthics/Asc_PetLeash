@@ -336,6 +336,8 @@ function addon:DoLocationCheck(allow_immediate)
 
 	-- nothing doing
 	self.override_pets = {}
+	-- check spec pets
+	self:DoSpecCheck(true)
 end
 
 function checkZone(self, ltype, zonename, curpet, allow_immediate)

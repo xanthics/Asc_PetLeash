@@ -92,3 +92,7 @@ L["quest:26831"] = "The Twilight Flight"
 L["quest:25371"] = "The Abyssal Ride"
 L["quest:11878"] = "Khu'nok Will Know"
 L["item:71137"] = "Brewfest Keg Pony"
+L["Custom Specialization"] = true
+L["Add Current Spec"] = true
+L["Specs"] = true
+L["Use a pet list from another Spec."] = true

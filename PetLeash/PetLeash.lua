@@ -57,7 +57,16 @@ local defaults = {
 					inherit = false,
 					pets = {} -- {spellid, spellid, ...}
 				}
-			}
+			},
+			customSpec = {
+				-- custom locations
+				["*"] = {
+					enable = false,
+					immediate = true,
+					inherit = false,
+					pets = {} -- {spellid, spellid, ...}
+				}
+			},
 		}
 	}
 }
@@ -347,6 +356,30 @@ local options = {
 					plugins = { data = {} }
 				},
 			}
+		},
+		specs = {
+			type = "group",
+			name = L["Specs"],
+			order = 12,
+			cmdHidden = true,
+			args = {
+				customSpec = {
+					type = "group",
+					name = L["Custom Specialization"],
+					order = 3,
+					args = {
+						addCurrentSpec = {
+							type = "execute",
+							name = L["Add Current Spec"],
+							order = 1,
+							func = function(info)
+								addon:AddCustomSpec(tostring(SpecializationUtil.GetActiveSpecialization()))
+							end,
+						},
+					},
+					plugins = { data = {} }
+				},
+			}
 		}
 	},
 }
@@ -413,6 +446,7 @@ function addon:OnInitialize()
 	self.optionsFrame = AceConfigDialog:AddToBlizOptions(self.name, self.name, nil, "main")
 	self.optionsFrame.Pets = AceConfigDialog:AddToBlizOptions(self.name, L["Enabled Pets"], self.name, "pets")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Locations"], self.name, "locations")
+	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Specs"], self.name, "specs")
 	self.optionsFrame.About = LibStub("LibAboutPanel").new(self.name, self.name)
 	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "petleash", "pl" })
 
@@ -429,6 +463,7 @@ function addon:OnInitialize()
 	self:RegisterEvent("BARBER_SHOP_OPEN")
 	self:RegisterEvent("QUEST_ACCEPTED")
 	self:RegisterEvent("QUEST_FINISHED")
+	self:RegisterEvent("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED")
 	--    self:RegisterEvent("ACTIVE_MANASTORM_UPDATED")
 
 	self:LoadPets()                 -- attempt to load pets (might fail)
@@ -597,6 +632,7 @@ function addon:LoadPets(updateconfig)
 
 	-- does nothing if we've called it successfully before
 	self:TryInitLocation()
+	self:TryInitSpec()
 	self:UpdateQuestList()
 
 	-- update timer
@@ -643,6 +679,7 @@ function addon:UpdateConfigTables()
 	end
 
 	self:UpdateLocationConfigTables()
+	self:UpdateSpecConfigTables()
 
 	-- Config Tables changed!
 	AceConfigRegistry:NotifyChange("PetLeash")
@@ -696,6 +733,7 @@ function addon:PLAYER_ENTERING_WORLD()
 		self:StartAutoSwitchTimer()
 	end
 
+	self:TryInitSpec()
 	self:TryInitLocation()
 	self:UpdateQuestList()
 end
@@ -777,6 +815,16 @@ function addon:OnZoneChanged()
 	end
 end
 
+function addon:OnSpecChanged(curSpec)
+	if self.currentSpec ~= curSpec then
+		self.currentSpec = curSpec
+		-- pet will be resummoned shortly
+		if (CanSummonPet()) then
+			self:DesummonPet(true)
+		end
+	end
+end
+
 function addon:ZONE_CHANGED()
 	self:DoLocationCheck(true)
 	self:OnZoneChanged()
@@ -790,6 +838,11 @@ end
 function addon:ZONE_CHANGED_NEW_AREA()
 	self:DoLocationCheck(true)
 	self:OnZoneChanged()
+end
+
+function addon:ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED(event, spec)
+	self:DoLocationCheck(true)
+	self:OnSpecChanged(spec)
 end
 
 function addon:PLAYER_UPDATE_RESTING()

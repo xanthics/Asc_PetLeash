@@ -1,7 +1,7 @@
-## Interface: 40300
+## Interface: 30300
 ## Title: PetLeash
 ## Version: 1.6.6
-## Notes: Walks the Dog 
+## Notes: Walks the Dog
 ## Author: End
 ## X-Email: end@cornhooves.org
 ## X-Credits: TomEpish (deDE), shwy72 (koKR), carignou (frFR), oXid_FoX (frFR), Freydis88 (deDE)
@@ -18,3 +18,4 @@ PetLeash.lua
 Locations.lua
 QuestItems.lua
 Broker.lua
+Specializations.lua
