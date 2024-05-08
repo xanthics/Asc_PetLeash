@@ -21,7 +21,7 @@ function addon:DeleteCustomSpec(specid)
 	wipe(self.db.char.sets.customSpec[specid])
 	self.db.char.sets.customSpec[specid] = nil
 	UpdateCustomSpecConfigTables(self)
-	self:DoLocationCheck(false)
+	self:DoSpecCheck(false)
 end
 
 function addon:GetSpecPet(ltype, name, spellid)
@@ -45,7 +45,7 @@ function addon:SetSpecPet(ltype, name, spellid, value)
 		table.remove(t, iszit)
 	end
 
-	self:DoLocationCheck(false)
+	self:DoSpecCheck(false)
 end
 
 --
@@ -93,7 +93,7 @@ local function config_spec_inherit_set(info, v)
 		info.handler:UpdateSpecConfigTables()
 	end
 
-	info.handler:DoLocationCheck(false)
+	info.handler:DoSpecCheck(false)
 end
 
 local function config_spec_inherit_get(info)
@@ -124,7 +124,7 @@ local loc_inherit_config = {
 	set = function(info, val)
 		assert(SPEC_TYPES[info[#info - 2]])
 		info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit = val
-		info.handler:DoLocationCheck(false)
+		info.handler:DoSpecCheck(false)
 	end
 }
 
@@ -234,7 +234,7 @@ function addon:TryInitSpec()
 
 	self:HasPet(true) -- not yet called?
 	self:UpdateSpecConfigTables()
-	self:DoLocationCheck(false)
+	self:DoSpecCheck(false)
 
 	self.TryInitSpec = function() end
 end
