@@ -96,3 +96,4 @@ L["Custom Specialization"] = true
 L["Add Current Spec"] = true
 L["Specs"] = true
 L["Use a pet list from another Spec."] = true
+L["Profiles"] = true

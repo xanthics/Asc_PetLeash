@@ -17,7 +17,7 @@ local special_locations = {
 		func = function()
 			local _, t = IsInInstance()
 			return t == "party" and
-			not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
+			not (addon.db.profile.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
 		end,
 	},
 	raid = {
@@ -25,7 +25,7 @@ local special_locations = {
 		func = function()
 			local _, t = IsInInstance()
 			return t == "raid" and
-			not (addon.db.char.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
+			not (addon.db.profile.sets.specialLocations["manastorm"].enable and C_Manastorm.IsInManastorm())
 		end,
 	},
 	manastorm = {
@@ -43,14 +43,14 @@ function addon:AddCustomLocation(name)
 		return
 	end
 
-	self.db.char.sets.customLocations[name].enable = true -- touch
+	self.db.profile.sets.customLocations[name].enable = true -- touch
 
 	UpdateCustomLocationConfigTables(self)
 end
 
 function addon:DeleteCustomLocation(name)
-	wipe(self.db.char.sets.customLocations[name])
-	self.db.char.sets.customLocations[name] = nil
+	wipe(self.db.profile.sets.customLocations[name])
+	self.db.profile.sets.customLocations[name] = nil
 	UpdateCustomLocationConfigTables(self)
 	self:DoLocationCheck(false)
 end
@@ -58,7 +58,7 @@ end
 function addon:GetLocationPet(ltype, name, spellid)
 	assert(LOCATION_TYPES[ltype])
 
-	for i, v in ipairs(self.db.char.sets[ltype][name].pets) do
+	for i, v in ipairs(self.db.profile.sets[ltype][name].pets) do
 		if (spellid == v) then
 			return i
 		end
@@ -68,7 +68,7 @@ end
 function addon:SetLocationPet(ltype, name, spellid, value)
 	assert(LOCATION_TYPES[ltype])
 
-	local t = self.db.char.sets[ltype][name].pets
+	local t = self.db.profile.sets[ltype][name].pets
 	local iszit = self:GetLocationPet(ltype, name, spellid)
 	if (value and not iszit) then
 		table.insert(t, spellid)
@@ -104,28 +104,28 @@ end
 
 local function config_location_enable_set(info, v)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].enable = v
+	info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].enable = v
 	info.handler:DoLocationCheck(false)
 end
 
 local function config_location_enable_get(info)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].enable
+	return info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].enable
 end
 
 local function config_location_immediate_set(info, v)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate = v
+	info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].immediate = v
 end
 
 local function config_location_immediate_get(info)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate
+	return info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].immediate
 end
 
 local function config_location_inherit_set(info, v)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	local loc = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]]
+	local loc = info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]]
 	if (not v) then
 		loc.inherit = false
 		info.handler:UpdateLocationConfigTables()
@@ -141,7 +141,7 @@ end
 
 local function config_location_inherit_get(info)
 	assert(LOCATION_TYPES[info[#info - 2]])
-	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
+	return info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit
 end
 
 local loc_pet_config = {
@@ -159,14 +159,14 @@ local loc_inherit_config = {
 	get = function(info)
 		assert(LOCATION_TYPES[info[#info - 2]])
 
-		local inherit = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
+		local inherit = info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit
 		if (inherit ~= true) then
 			return inherit
 		end
 	end,
 	set = function(info, val)
 		assert(LOCATION_TYPES[info[#info - 2]])
-		info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit = val
+		info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit = val
 		info.handler:DoLocationCheck(false)
 	end
 }
@@ -190,7 +190,7 @@ function UpdateCustomLocationConfigTables(self, nosignal)
 	wipe(loc_args) -- TODO: check to see if locations is dirty before wiping
 	wipe(loc_inherit_config.values)
 
-	for name, data in pairs(self.db.char.sets.customLocations) do
+	for name, data in pairs(self.db.profile.sets.customLocations) do
 		if (data.enable) then
 			if (not loc_inherit_config.values[name]) then
 				loc_inherit_config.values[name] = name
@@ -199,7 +199,7 @@ function UpdateCustomLocationConfigTables(self, nosignal)
 			buildConfigLocation(loc_args,
 				name,
 				name,
-				self.db.char.sets.customLocations[name].inherit,
+				self.db.profile.sets.customLocations[name].inherit,
 				"customLocations")
 		end
 	end
@@ -215,7 +215,7 @@ function UpdateSpecialLocationConfigTables(self, nosignal)
 			self.options.args.locations.args.specialLocations.plugins.data,
 			key,
 			data.name,
-			self.db.char.sets.specialLocations[key].inherit,
+			self.db.profile.sets.specialLocations[key].inherit,
 			"specialLocations")
 	end
 
@@ -346,7 +346,7 @@ function checkZone(self, ltype, zonename, curpet, allow_immediate)
 	end
 
 	-- don't let AceDB generate an entry for us
-	local locdata = rawget(self.db.char.sets[ltype], zonename)
+	local locdata = rawget(self.db.profile.sets[ltype], zonename)
 
 	-- make sure entry exists
 	if (not locdata or not locdata.enable) then
@@ -355,8 +355,8 @@ function checkZone(self, ltype, zonename, curpet, allow_immediate)
 
 	local pets = locdata.pets
 	if (locdata.inherit and locdata.inherit ~= true
-			and self.db.char.sets.customLocations[locdata.inherit]) then
-		pets = self.db.char.sets.customLocations[locdata.inherit].pets
+			and self.db.profile.sets.customLocations[locdata.inherit]) then
+		pets = self.db.profile.sets.customLocations[locdata.inherit].pets
 	end
 
 	if (locdata and #pets > 0) then

@@ -26,9 +26,7 @@ local defaults = {
 		autoSwitchTimer = false,
 		autoSwitchCitiesOnly = false,
 		autoSwitchOnZone = false,
-		weightedPets = false
-	},
-	char = {
+		weightedPets = false,
 		ignore_pets = { -- [spellid] = true, hide.  if false, don't hide
 			[25162] = true, -- Disgusing Oozling (Combat Effect)
 			[92398] = true, -- Guild Page, Horde (Long cooldown)
@@ -37,7 +35,6 @@ local defaults = {
 			[92397] = true, -- Guild Herald, Alliance (Long cooldown)
 		},
 		weights = {}, -- [spellid] = num (if nil default is 1)
-
 		sets = {
 			-- locations
 			customLocations = {
@@ -380,7 +377,8 @@ local options = {
 					plugins = { data = {} }
 				},
 			}
-		}
+		},
+		profiles = nil, -- reserve for later setup
 	},
 }
 
@@ -428,7 +426,19 @@ local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+local function migrateData()
+	if not PetLeashDB.char then print("empty") return end
+	for k,v in pairs(PetLeashDB.char) do
+		for j,l in pairs(v) do
+			PetLeashDB.profiles[k][j] = l
+		end
+	end
+	PetLeashDB.char = nil
+	print("PetLeash: Data migrated to profiles")
+end
+
 function addon:OnInitialize()
+	migrateData()
 	self.db = LibStub("AceDB-3.0"):New("PetLeashDB", defaults)
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChange")
@@ -440,6 +450,7 @@ function addon:OnInitialize()
 	self.player_invisible = false
 
 	self.options = options
+	self.options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	self.options_slashcmd = options_slashcmd
 
 	AceConfig:RegisterOptionsTable(self.name, options)
@@ -447,6 +458,7 @@ function addon:OnInitialize()
 	self.optionsFrame.Pets = AceConfigDialog:AddToBlizOptions(self.name, L["Enabled Pets"], self.name, "pets")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Locations"], self.name, "locations")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Specs"], self.name, "specs")
+	self.optionsFrame.Profiles = AceConfigDialog:AddToBlizOptions(self.name, L["Profiles"], self.name, "profiles")
 	self.optionsFrame.About = LibStub("LibAboutPanel").new(self.name, self.name)
 	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "petleash", "pl" })
 
@@ -615,7 +627,7 @@ function addon:LoadPets(updateconfig)
 			return -- pets not loaded yet?
 		end
 
-		if (not self.db.char.ignore_pets[spellid]) then
+		if (not self.db.profile.ignore_pets[spellid]) then
 			table.insert(self.usable_pets, spellid)
 		end
 
@@ -687,22 +699,22 @@ end
 
 function addon:Config_PetToggle_Set(info, v)
 	if (v) then
-		self.db.char.ignore_pets[tonumber(info[#info])] = false
+		self.db.profile.ignore_pets[tonumber(info[#info])] = false
 	else
-		self.db.char.ignore_pets[tonumber(info[#info])] = true
+		self.db.profile.ignore_pets[tonumber(info[#info])] = true
 	end
 
 	self:LoadPets(false)
 end
 
 function addon:Config_PetToggle_Get(info)
-	return not self.db.char.ignore_pets[tonumber(info[#info])]
+	return not self.db.profile.ignore_pets[tonumber(info[#info])]
 end
 
 function addon:Config_PetToggle_Weighted_Get(info)
 	local id = tonumber(info[#info])
-	if (not self.db.char.ignore_pets[id]) then
-		return math.floor((self.db.char.weights[id] or 1) * 5) + 1
+	if (not self.db.profile.ignore_pets[id]) then
+		return math.floor((self.db.profile.weights[id] or 1) * 5) + 1
 	end
 	return 1
 end
@@ -710,17 +722,17 @@ end
 function addon:Config_PetToggle_Weighted_Set(info, v)
 	local id = tonumber(info[#info])
 	if (v == 1) then
-		self.db.char.ignore_pets[id] = true
+		self.db.profile.ignore_pets[id] = true
 	else
-		self.db.char.ignore_pets[id] = false
-		self.db.char.weights[id] = (v - 1) / 5
+		self.db.profile.ignore_pets[id] = false
+		self.db.profile.weights[id] = (v - 1) / 5
 	end
 	self:LoadPets(false)
 end
 
 function addon:_Config_PetToggle_SetAll(info, v)
 	for key in pairs(info.options.args.pets.args.pets.args) do
-		self.db.char.ignore_pets[tonumber(key)] = v
+		self.db.profile.ignore_pets[tonumber(key)] = v
 	end
 	self:LoadPets(false)
 end
@@ -991,7 +1003,7 @@ local function pick_weighted(self, countdown)
 	countdown = (countdown or 1000) -- upper bound on tries
 
 	local random_spellid = self.usable_pets[math.random(#self.usable_pets)]
-	local weight = self.db.char.weights[random_spellid] or 1
+	local weight = self.db.profile.weights[random_spellid] or 1
 
 	assert(weight > 0)
 

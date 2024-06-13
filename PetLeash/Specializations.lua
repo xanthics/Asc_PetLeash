@@ -12,14 +12,14 @@ function addon:AddCustomSpec(specid)
 		return
 	end
 
-	self.db.char.sets.customSpec[specid].enable = true -- touch
+	self.db.profile.sets.customSpec[specid].enable = true -- touch
 
 	UpdateCustomSpecConfigTables(self)
 end
 
 function addon:DeleteCustomSpec(specid)
-	wipe(self.db.char.sets.customSpec[specid])
-	self.db.char.sets.customSpec[specid] = nil
+	wipe(self.db.profile.sets.customSpec[specid])
+	self.db.profile.sets.customSpec[specid] = nil
 	UpdateCustomSpecConfigTables(self)
 	self:DoSpecCheck(false)
 end
@@ -27,7 +27,7 @@ end
 function addon:GetSpecPet(ltype, name, spellid)
 	assert(SPEC_TYPES[ltype])
 
-	for i, v in ipairs(self.db.char.sets[ltype][name].pets) do
+	for i, v in ipairs(self.db.profile.sets[ltype][name].pets) do
 		if (spellid == v) then
 			return i
 		end
@@ -37,7 +37,7 @@ end
 function addon:SetSpecPet(ltype, name, spellid, value)
 	assert(SPEC_TYPES[ltype])
 
-	local t = self.db.char.sets[ltype][name].pets
+	local t = self.db.profile.sets[ltype][name].pets
 	local iszit = self:GetSpecPet(ltype, name, spellid)
 	if (value and not iszit) then
 		table.insert(t, spellid)
@@ -72,17 +72,17 @@ end
 
 local function config_spec_immediate_set(info, v)
 	assert(SPEC_TYPES[info[#info - 2]])
-	info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate = v
+	info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].immediate = v
 end
 
 local function config_spec_immediate_get(info)
 	assert(SPEC_TYPES[info[#info - 2]])
-	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].immediate
+	return info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].immediate
 end
 
 local function config_spec_inherit_set(info, v)
 	assert(SPEC_TYPES[info[#info - 2]])
-	local loc = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]]
+	local loc = info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]]
 	if (not v) then
 		loc.inherit = false
 		info.handler:UpdateSpecConfigTables()
@@ -98,7 +98,7 @@ end
 
 local function config_spec_inherit_get(info)
 	assert(SPEC_TYPES[info[#info - 2]])
-	return info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
+	return info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit
 end
 
 local loc_pet_config = {
@@ -116,14 +116,14 @@ local loc_inherit_config = {
 	get = function(info)
 		assert(SPEC_TYPES[info[#info - 2]])
 
-		local inherit = info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit
+		local inherit = info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit
 		if (inherit ~= true) then
 			return inherit
 		end
 	end,
 	set = function(info, val)
 		assert(SPEC_TYPES[info[#info - 2]])
-		info.handler.db.char.sets[info[#info - 2]][info[#info - 1]].inherit = val
+		info.handler.db.profile.sets[info[#info - 2]][info[#info - 1]].inherit = val
 		info.handler:DoSpecCheck(false)
 	end
 }
@@ -147,7 +147,7 @@ function UpdateCustomSpecConfigTables(self, nosignal)
 	wipe(loc_args) -- TODO: check to see if specs is dirty before wiping
 	wipe(loc_inherit_config.values)
 
-	for name, data in pairs(self.db.char.sets.customSpec) do
+	for name, data in pairs(self.db.profile.sets.customSpec) do
 		if (data.enable) then
 			if (not loc_inherit_config.values[name]) then
 				loc_inherit_config.values[name] = name
@@ -156,7 +156,7 @@ function UpdateCustomSpecConfigTables(self, nosignal)
 			buildConfigSpec(loc_args,
 				name,
 				name,
-				self.db.char.sets.customSpec[name].inherit,
+				self.db.profile.sets.customSpec[name].inherit,
 				"customSpec")
 		end
 	end
@@ -265,7 +265,7 @@ function checkSpec(self, ltype, cur_spec, curpet, allow_immediate)
 	end
 
 	-- don't let AceDB generate an entry for us
-	local specdata = rawget(self.db.char.sets[ltype], cur_spec)
+	local specdata = rawget(self.db.profile.sets[ltype], cur_spec)
 
 	-- make sure entry exists
 	if (not specdata or not specdata.enable) then
@@ -274,8 +274,8 @@ function checkSpec(self, ltype, cur_spec, curpet, allow_immediate)
 
 	local pets = specdata.pets
 	if (specdata.inherit and specdata.inherit ~= true
-			and self.db.char.sets.customSpec[specdata.inherit]) then
-		pets = self.db.char.sets.customSpec[specdata.inherit].pets
+			and self.db.profile.sets.customSpec[specdata.inherit]) then
+		pets = self.db.profile.sets.customSpec[specdata.inherit].pets
 	end
 
 	if (specdata and #pets > 0) then
