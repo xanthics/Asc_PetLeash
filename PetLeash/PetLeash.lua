@@ -427,7 +427,7 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 local function migrateData()
-	if not PetLeashDB.char then print("empty") return end
+	if not PetLeashDB.char then return end
 	for k,v in pairs(PetLeashDB.char) do
 		for j,l in pairs(v) do
 			PetLeashDB.profiles[k][j] = l
