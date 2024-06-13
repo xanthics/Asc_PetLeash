@@ -454,12 +454,12 @@ function addon:OnInitialize()
 	self.options_slashcmd = options_slashcmd
 
 	AceConfig:RegisterOptionsTable(self.name, options)
-	self.optionsFrame = AceConfigDialog:AddToBlizOptions(self.name, self.name, nil, "main")
+	self.optionsFrame = LibStub("LibAboutPanel").new(nil, self.name)
+	self.optionsFrame.General = AceConfigDialog:AddToBlizOptions(self.name, L["General"], self.name, "main")
 	self.optionsFrame.Pets = AceConfigDialog:AddToBlizOptions(self.name, L["Enabled Pets"], self.name, "pets")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Locations"], self.name, "locations")
 	self.optionsFrame.Locations = AceConfigDialog:AddToBlizOptions(self.name, L["Specs"], self.name, "specs")
 	self.optionsFrame.Profiles = AceConfigDialog:AddToBlizOptions(self.name, L["Profiles"], self.name, "profiles")
-	self.optionsFrame.About = LibStub("LibAboutPanel").new(self.name, self.name)
 	AceConfig:RegisterOptionsTable(self.name .. "SlashCmd", options_slashcmd, { "petleash", "pl" })
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
