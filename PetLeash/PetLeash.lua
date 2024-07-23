@@ -16,6 +16,7 @@ local defaults = {
 	profile = {
 		enable = true,
 		enableInCombat = false,
+		desummonInCombat = true,
 		enableInBattleground = true,
 		disableOutsideCities = false,
 		dismissWhenStealthed = true,
@@ -107,6 +108,14 @@ local options = {
 							get = config_toggle_get,
 							set = config_toggle_set
 						},
+						desummonInCombat = {
+                            type = "toggle",
+                            name = L["Desummon Pet In Combat"],
+                            order = 12,
+                            width = "double",
+                            get = config_toggle_get,
+                            set = config_toggle_set
+                        },
 						enableInBattleground = {
 							type = "toggle",
 							name = L["Enable In Battlegrounds/Arena"],
@@ -417,6 +426,7 @@ local options_slashcmd = {
 		},
 		enable = options.args.main.args.general.args.enable,
 		enableInCombat = options.args.main.args.general.args.enableInCombat,
+		desummonInCombat = options.args.main.args.general.args.desummonInCombat,
 		dismissWhenStealthed = options.args.main.args.general.args.dismissWhenStealthed,
 		disableForQuestItems = options.args.main.args.general.args.disableForQuestItems,
 	},
@@ -471,6 +481,7 @@ function addon:OnInitialize()
 	self:RegisterEvent("ZONE_CHANGED_INDOORS")
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
+	self:RegisterEvent("PLAYER_REGEN_DISABLED")
 	self:RegisterEvent("BARBER_SHOP_CLOSE")
 	self:RegisterEvent("BARBER_SHOP_OPEN")
 	self:RegisterEvent("QUEST_ACCEPTED")
@@ -859,6 +870,12 @@ end
 
 function addon:PLAYER_UPDATE_RESTING()
 	self:DoLocationCheck(true)
+end
+
+function addon:PLAYER_REGEN_DISABLED()
+    if self.db.profile.desummonInCombat then
+        addon:DesummonPet(true)
+    end
 end
 
 function addon:QUEST_ACCEPTED()
