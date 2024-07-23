@@ -16,7 +16,10 @@ local defaults = {
 	profile = {
 		enable = true,
 		enableInCombat = false,
-		desummonInCombat = true,
+		desummonInCombat = false,
+		desummonRaidCombat = false,
+		desummonPartyCombat = false,
+		desummonVSBoss = false,
 		enableInBattleground = true,
 		disableOutsideCities = false,
 		dismissWhenStealthed = true,
@@ -110,8 +113,32 @@ local options = {
 						},
 						desummonInCombat = {
                             type = "toggle",
-                            name = L["Desummon Pet In Combat"],
+                            name = L["Desummon Pet During Any Combat"],
                             order = 12,
+                            width = "double",
+                            get = config_toggle_get,
+                            set = config_toggle_set
+                        },
+						desummonPartyCombat = {
+                            type = "toggle",
+                            name = L["Desummon Pet During Party Combat"],
+                            order = 13,
+                            width = "double",
+                            get = config_toggle_get,
+                            set = config_toggle_set
+                        },
+						desummonRaidCombat = {
+                            type = "toggle",
+                            name = L["Desummon Pet During Raid Combat"],
+                            order = 14,
+                            width = "double",
+                            get = config_toggle_get,
+                            set = config_toggle_set
+                        },
+						desummonVSBoss = {
+                            type = "toggle",
+                            name = L["Desummon Pet During Boss Fights"],
+                            order = 15,
                             width = "double",
                             get = config_toggle_get,
                             set = config_toggle_set
@@ -119,7 +146,7 @@ local options = {
 						enableInBattleground = {
 							type = "toggle",
 							name = L["Enable In Battlegrounds/Arena"],
-							order = 12,
+							order = 16,
 							width = "double",
 							get = config_toggle_get,
 							set = config_toggle_set
@@ -127,7 +154,7 @@ local options = {
 						disableOutsideCities = {
 							type = "toggle",
 							name = L["Only Enable in Cities"],
-							order = 13,
+							order = 17,
 							width = "double",
 							get = config_toggle_get,
 							set = config_toggle_set
@@ -135,7 +162,7 @@ local options = {
 						dismissWhenStealthed = {
 							type = "toggle",
 							name = L["Dismiss When Stealthed or Invisible"],
-							order = 14,
+							order = 18,
 							width = "double",
 							get = config_toggle_get,
 							set = config_toggle_set
@@ -143,7 +170,7 @@ local options = {
 						dismissWhileFlying = {
 							type = "toggle",
 							name = L["Dismiss When Flying"],
-							order = 15,
+							order = 19,
 							width = "double",
 							get = config_toggle_get,
 							set = config_toggle_set
@@ -427,6 +454,9 @@ local options_slashcmd = {
 		enable = options.args.main.args.general.args.enable,
 		enableInCombat = options.args.main.args.general.args.enableInCombat,
 		desummonInCombat = options.args.main.args.general.args.desummonInCombat,
+		desummonPartyCombat = options.args.main.args.general.args.desummonPartyCombat,
+		desummonRaidCombat = options.args.main.args.general.args.desummonRaidCombat,
+		desummonVSBoss = options.args.main.args.general.args.desummonVSBoss,
 		dismissWhenStealthed = options.args.main.args.general.args.dismissWhenStealthed,
 		disableForQuestItems = options.args.main.args.general.args.disableForQuestItems,
 	},
@@ -482,6 +512,7 @@ function addon:OnInitialize()
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	self:RegisterEvent("PLAYER_UPDATE_RESTING")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
+	self:RegisterEvent("ENCOUNTER_START")
 	self:RegisterEvent("BARBER_SHOP_CLOSE")
 	self:RegisterEvent("BARBER_SHOP_OPEN")
 	self:RegisterEvent("QUEST_ACCEPTED")
@@ -872,8 +903,15 @@ function addon:PLAYER_UPDATE_RESTING()
 	self:DoLocationCheck(true)
 end
 
+function addon:ENCOUNTER_START()
+    if self.db.profile.desummonVSBoss then
+        addon:DesummonPet(true)
+    end
+end
+
 function addon:PLAYER_REGEN_DISABLED()
-    if self.db.profile.desummonInCombat then
+	local _, t = IsInInstance()
+    if self.db.profile.desummonInCombat  or (self.db.profile.desummonPartyCombat and t == "party") or (self.db.profile.desummonRaidCombat and t == "raid") then
         addon:DesummonPet(true)
     end
 end
