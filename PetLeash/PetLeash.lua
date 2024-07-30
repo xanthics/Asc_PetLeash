@@ -478,8 +478,8 @@ local function migrateData()
 end
 
 function addon:OnInitialize()
-	migrateData()
 	self.db = LibStub("AceDB-3.0"):New("PetLeashDB", defaults)
+	migrateData()
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChange")
