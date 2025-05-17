@@ -686,6 +686,7 @@ function addon:LoadPets(updateconfig)
 	-- Update general pet tab to show total number of pets
 	if prevpets ~= numpets then
 		options.args.pets.name = L["Enabled Pets"] .. " ("..numpets.." "..L["total pets"]..")"
+		prevpets = numpets
 	end
 
 	if (updateconfig == nil or updateconfig) then
