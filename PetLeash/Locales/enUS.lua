@@ -31,6 +31,7 @@ L["Auto Switch when changing maps"] = true
 L["Seconds between switch"] = true
 L["Open Configuration"] = true
 L["Enabled Pets"] = true
+L["total pets"] = true
 L["Enable All"] = true
 L["Disable All"] = true
 L["Weighted Pets"] = true

@@ -35,6 +35,7 @@ L["Enable In Battlegrounds/Arena"] = "In Schlachtfeldern/Arena aktivieren"
 L["Enable In Combat"] = "Beschw\195\182ren im Kampf aktivieren"
 L["Enabled"] = "Aktiviert"
 L["Enabled Pets"] = "Begleiter aktivieren"
+L["total pets"] = true
 L["Hardly Ever"] = "Kaum"
 L["How long must pass before a player is considered idle enough to summon a pet."] = "Wie lange soll gewartet werden bevor ein Begleiter beschworen wird"
 L["Immediate"] = "Sofort"

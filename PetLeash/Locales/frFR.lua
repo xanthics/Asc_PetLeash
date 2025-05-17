@@ -37,6 +37,7 @@ L["Enable In Combat"] = "Actif en combat" -- Needs review
 -- L["Enable Timed Auto Switch"] = ""
 L["Enabled"] = "Activ\195\169"
 L["Enabled Pets"] = "Familiers activ\195\169s"
+L["total pets"] = true
 L["Hardly Ever"] = "Presque tout le temps"
 L["How long must pass before a player is considered idle enough to summon a pet."] = "Combien de temps doit s'\195\169couler avant qu'un joueur soit consid\195\169r\195\169 inoccup\195\169 pour invoquer un familier."
 L["Immediate"] = "Imm\195\169diat"

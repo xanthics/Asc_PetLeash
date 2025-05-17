@@ -10,6 +10,8 @@ BINDING_NAME_PETLEASH_DESUMMON = L["Desummon Pet"]
 BINDING_NAME_PETLEASH_TOGGLE = L["Toggle Non-Combat Pet"]
 BINDING_NAME_PETLEASH_CONFIG = L["Open Configuration"]
 
+-- keep track of number of pets so we only change the "Enable Pets" name when number of pets change
+local prevpets = 0
 
 -- Default DB
 local defaults = {
@@ -32,7 +34,7 @@ local defaults = {
 		autoSwitchOnZone = false,
 		weightedPets = false,
 		ignore_pets = { -- [spellid] = true, hide.  if false, don't hide
-			[25162] = true, -- Disgusing Oozling (Combat Effect)
+			[25162] = true, -- Disgusting Oozling (Combat Effect)
 			[92398] = true, -- Guild Page, Horde (Long cooldown)
 			[92396] = true, -- Guild Herald, Horde (Long cooldown)
 			[92395] = true, -- Guild Page, Alliance (Long cooldown)
@@ -296,7 +298,7 @@ local options = {
 		},
 		pets = {
 			type = "group",
-			name = L["Enabled Pets"],
+			name = L["Enabled Pets"], -- .." ("..GetNumCompanions("CRITTER").." total pets)",
 			order = 10,
 			cmdHidden = true,
 			args = {
@@ -662,7 +664,8 @@ addon.CanSummonPet = CanSummonPet -- expose (mostly for debugging)
 function addon:LoadPets(updateconfig)
 	wipe(self.usable_pets)
 
-	for i = 1, GetNumCompanions("CRITTER") do
+	local numpets = GetNumCompanions("CRITTER")
+	for i = 1, numpets do
 		local _, name, spellid = GetCompanionInfo("CRITTER", i)
 
 		if (not name) then
@@ -678,6 +681,11 @@ function addon:LoadPets(updateconfig)
 		end
 		self.pet_map[spellid].id = i
 		self.pet_map[spellid].name = name
+	end
+
+	-- Update general pet tab to show total number of pets
+	if prevpets ~= numpets then
+		options.args.pets.name = L["Enabled Pets"] .. " ("..numpets.." "..L["total pets"]..")"
 	end
 
 	if (updateconfig == nil or updateconfig) then
