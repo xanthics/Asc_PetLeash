@@ -833,7 +833,7 @@ function addon:UPDATE_STEALTH()
 	end
 end
 
-local INVIS_SPELLS = { 66, 11392, 3680, 80326 }
+local INVIS_SPELLS = { 66, 11392, 3680 }
 function addon:UNIT_AURA(event, unit)
 	if (unit ~= "player") then
 		return
