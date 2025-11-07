@@ -61,6 +61,10 @@ local defaults = {
 					pets = {} -- {spellid, spellid, ...}
 				}
 			},
+		}
+	},
+	char = {
+		sets = {
 			customSpec = {
 				-- custom locations
 				["*"] = {
@@ -468,20 +472,20 @@ local AceConfigRegistry = LibStub("AceConfigRegistry-3.0")
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
-local function migrateData()
-	if not PetLeashDB.char then return end
-	for k,v in pairs(PetLeashDB.char) do
+function addon:migrateData()
+	if not self.db.profile.sets.customSpec then return end
+	for k,v in pairs(self.db.profile.sets.customSpec) do
 		for j,l in pairs(v) do
-			PetLeashDB.profiles[k][j] = l
+			self.db.profile.sets.customSpec[k][j] = l
 		end
 	end
-	PetLeashDB.char = nil
-	print("PetLeash: Data migrated to profiles")
+	self.db.profile.sets.customSpec = nil
+	print("PetLeash: Spec Data migrated to char")
 end
 
 function addon:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("PetLeashDB", defaults)
-	migrateData()
+	self:migrateData()
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChange")
