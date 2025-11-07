@@ -484,7 +484,7 @@ function addon:migrateData()
 end
 
 function addon:OnInitialize()
-	self.db = LibStub("AceDB-3.0"):New("PetLeashDB", defaults)
+	self.db = LibStub("AceDB-3.0"):New("PetLeashDB", defaults, true)
 	self:migrateData()
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChange")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChange")
