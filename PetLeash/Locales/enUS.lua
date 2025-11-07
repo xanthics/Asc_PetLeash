@@ -15,7 +15,7 @@ if not L then return end
 
 L["Enable Auto-Summon"] = true
 L["Enable In Combat"] = true
-L["Enable In Battlegrounds/Arena"] = true
+L["Dismiss In Battlegrounds/Arena"] = true
 L["Only Enable in Cities"] = true
 L["Dismiss When Stealthed or Invisible"] = true
 L["Dismiss When Flying"] = true

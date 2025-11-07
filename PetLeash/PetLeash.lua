@@ -151,7 +151,7 @@ local options = {
                         },
 						enableInBattleground = {
 							type = "toggle",
-							name = L["Enable In Battlegrounds/Arena"],
+							name = L["Dismiss In Battlegrounds/Arena"],
 							order = 16,
 							width = "double",
 							get = config_toggle_get,
@@ -992,6 +992,7 @@ function addon:IsPetSummonReady()
 	elseif (self.db.profile.disableForQuestItems and self:HasQuestItem()) then
 		return
 	elseif (not self.db.profile.enableInBattleground and InBattlegroundOrArena()) then
+		addon:DesummonPet(true)
 		return
 	elseif (self.db.profile.disableOutsideCities and not IsResting()) then
 		return
